@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>PokéMedia — L'Encyclopédie Bio-Analytique</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root{--bg:#020617;--card:#111827;--text:#e5e7eb;--accent:#22c55e;}
+        *{box-sizing:border-box; transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);}
+        body{margin:0;font-family: 'Segoe UI', system-ui, sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+        
+        /* Navigation */
+        nav { background: #0f172a; display: flex; justify-content: center; gap: 15px; padding: 1rem; position: sticky; top: 0; z-index: 1000; border-bottom: 2px solid var(--accent); }
+        .nav-link { color: white; text-decoration: none; font-weight: bold; padding: 10px 20px; border-radius: 10px; cursor: pointer; border: none; background: transparent; }
+        .nav-link.active { background: var(--accent); color: black; }
+
+        .page { display: none; padding: 20px; max-width: 1400px; margin: auto; animation: fadeIn 0.4s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Introduction Complexe */
+        .intro-header { background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8)); padding: 3rem; border-radius: 40px; margin-bottom: 2.5rem; border: 1px solid rgba(34, 197, 94, 0.2); position: relative; overflow: hidden; border-left: 8px solid var(--accent); }
+        .intro-header h1 { margin: 0; font-size: 2.8rem; letter-spacing: -1px; color: var(--accent); }
+        .intro-header p { font-size: 1.1rem; max-width: 800px; line-height: 1.7; color: #94a3b8; margin: 15px 0; }
+        .stats-overview { display: flex; gap: 30px; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+        .stat-item { display: flex; flex-direction: column; }
+        .stat-value { font-size: 1.8rem; font-weight: 800; color: white; }
+        .stat-label { font-size: 0.8rem; text-transform: uppercase; color: var(--accent); letter-spacing: 1px; }
+
+        /* Filtres */
+        #controls-wrapper { background: #0f172a; border-radius: 24px; margin-bottom: 2rem; border: 1px solid rgba(255,255,255,0.1); padding: 1.5rem; }
+        .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        input, select { padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: #1e293b; color: white; width: 100%; outline: none; }
+        .special-filters { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; justify-content: center; }
+        .filter-chip { padding: 8px 18px; border-radius: 20px; background: #1e293b; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-size: 0.85rem; font-weight: bold; color: #94a3b8; }
+        .filter-chip.active { background: var(--accent); color: black; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); border-color: var(--accent); }
+
+        /* Grille & Cartes */
+        #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px,1fr)); gap: 1.5rem; }
+        .card { border-radius: 28px; padding: 1.5rem; text-align: center; cursor: pointer; position: relative; height: 380px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 3px solid rgba(255,255,255,0.1); overflow: hidden; background: #1e293b; }
+        .card:hover { transform: translateY(-8px); border-color: white; filter: brightness(1.1); }
+        .card img { width: 160px; height: 160px; object-fit: contain; z-index: 2; filter: drop-shadow(0 8px 10px rgba(0,0,0,0.3)); }
+        .card-info { width: 100%; background: rgba(0,0,0,0.6); padding: 12px; border-radius: 20px; backdrop-filter: blur(8px); z-index: 2; }
+        .type-badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; color: white; text-transform: uppercase; margin: 2px; }
+        .variant-tag { background: var(--accent); color: black; font-size: 0.65rem; font-weight: 900; padding: 3px 8px; border-radius: 5px; margin-top: 5px; display: inline-block; }
+
+        /* Quiz */
+        .quiz-container { max-width: 600px; margin: 40px auto; background: #0f172a; padding: 30px; border-radius: 35px; border: 2px solid var(--accent); text-align: center; }
+        .quiz-img { width: 220px; height: 220px; filter: brightness(0); transition: 0.5s; margin-bottom: 20px; }
+        .quiz-img.reveal { filter: brightness(1); }
+        .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .quiz-btn { padding: 15px; border-radius: 12px; border: 2px solid #1e293b; background: #1e293b; color: white; cursor: pointer; font-weight: bold; }
+        .quiz-btn.correct { background: var(--accent) !important; color: black !important; }
+
+        /* Modal */
+        #modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
+        .modal-box { background: #0f172a; padding: 2.5rem; border-radius: 35px; width: 100%; max-width: 550px; text-align: center; border: 1px solid var(--accent); max-height: 90vh; overflow-y: auto; }
+        .modal-desc { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin: 15px 0; font-style: italic; font-size: 0.95rem; text-align: left; border-left: 4px solid var(--accent); }
+        .stat-bar-bg { background: #1e293b; height: 10px; border-radius: 5px; margin-top: 4px; overflow: hidden; }
+        .stat-bar-fill { height: 100%; background: var(--accent); }
+
+        .pagination { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 2rem 0; }
+        .page-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #1e293b; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .page-btn.active { background: var(--accent); color: black; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <button class="nav-link active" onclick="showPage('pokedex', this)">📕 Encyclopédie</button>
+    <button class="nav-link" onclick="showPage('quiz', this); resetQuiz()">❓ Quiz Interactif</button>
+</nav>
+
+<div id="pokedex" class="page active">
+    <div class="intro-header">
+        <h1>Système PokéMedia v9.2</h1>
+        <p>Accès autorisé. Base de données synchronisée avec le Global Link. Analyse biologique et taxonomique des spécimens répertoriés de Kanto à Paldea.</p>
+        <div class="stats-overview">
+            <div class="stat-item"><span class="stat-value">1025</span><span class="stat-label">Spécimens</span></div>
+            <div class="stat-item"><span class="stat-value">18</span><span class="stat-label">Types Elém.</span></div>
+            <div class="stat-item"><span class="stat-value">9</span><span class="stat-label">Générations</span></div>
+        </div>
+    </div>
+
+    <div id="controls-wrapper">
+        <div class="controls-grid">
+            <input id="search" placeholder="Rechercher un spécimen (Nom ou ID)..." oninput="currentPage=1;renderPokedex()">
+            <select id="region" onchange="currentPage=1;renderPokedex()">
+                <option value="all">Index National Complet</option>
+                <option value="1-151">Gén. 1 - Kanto</option>
+                <option value="152-251">Gén. 2 - Johto</option>
+                <option value="252-386">Gén. 3 - Hoenn</option>
+                <option value="387-493">Gén. 4 - Sinnoh</option>
+                <option value="494-649">Gén. 5 - Unys</option>
+                <option value="650-721">Gén. 6 - Kalos</option>
+                <option value="722-809">Gén. 7 - Alola</option>
+                <option value="810-898">Gén. 8 - Galar</option>
+                <option value="899-1025">Gén. 9 - Paldea</option>
+            </select>
+        </div>
+        <div class="special-filters">
+            <div class="filter-chip" id="f-deoxys" onclick="toggleSpecial('deoxys')">🌀 Deoxys</div>
+            <div class="filter-chip" id="f-mega" onclick="toggleSpecial('mega')">✨ Méga-Évolutions</div>
+            <div class="filter-chip" id="f-gmax" onclick="toggleSpecial('gmax')">🔥 Gigamax</div>
+            <div class="filter-chip" id="f-alola" onclick="toggleSpecial('alola')">🏝️ Formes Alola</div>
+            <div class="filter-chip" id="f-galar" onclick="toggleSpecial('galar')">🛡️ Formes Galar</div>
+            <div class="filter-chip" id="f-hisui" onclick="toggleSpecial('hisui')">📜 Formes Hisui</div>
+            <div class="filter-chip" id="f-rotom" onclick="toggleSpecial('rotom')">⚙️ Motisma</div>
+        </div>
+    </div>
+    
+    <div id="grid"></div>
+    <div id="pagination" class="pagination"></div>
+</div>
+
+<div id="quiz" class="page">
+    <div class="quiz-container">
+        <h2 style="color: var(--accent);">IDENTIFICATION DE SILHOUETTE</h2>
+        <img id="quiz-img" class="quiz-img" src="">
+        <div id="quiz-options" class="quiz-options"></div>
+        <button id="next-quiz" onclick="resetQuiz()" style="display:none; margin: 20px auto 0; background: var(--accent); color: black; border: none; padding: 12px 30px; border-radius: 12px; font-weight: bold; cursor: pointer;">SÉQUENCE SUIVANTE</button>
+    </div>
+</div>
+
+<div id="modal" onclick="this.style.display='none'"><div class="modal-box" onclick="event.stopPropagation()"><div id="modal-body"></div></div></div>
+
+<script>
+let currentPage = 1, perPage = 48, allPokemon = [], activeSpecial = null;
+const typeFR = {fire:'Feu',water:'Eau',grass:'Plante',normal:'Normal',electric:'Electrik',fighting:'Combat',poison:'Poison',ground:'Sol',flying:'Vol',psychic:'Psy',bug:'Insecte',rock:'Roche',ghost:'Spectre',dragon:'Dragon',dark:'Ténèbres',steel:'Acier',fairy:'Fée',ice:'Glace'};
+const colors = {Feu:'#EE8130',Eau:'#6390F0',Plante:'#7AC74C',Normal:'#A8A77A',Electrik:'#F7D02C',Combat:'#C22E28',Poison:'#A33EA1',Sol:'#E2BF65',Vol:'#A98FF3',Psy:'#F95587',Insecte:'#A6B91A',Roche:'#B6A136',Spectre:'#735797',Dragon:'#6F35FC',Ténèbres:'#705746',Acier:'#B7B7CE',Fée:'#D685AD',Glace:'#96D9D6'};
+
+async function init() {
+    for(let i=1; i<=1025; i++) {
+        allPokemon.push({ id: i, nameFR: null, types: [], img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${i}.png`, isVariant: false });
+    }
+    renderPokedex();
+    await loadDetails();
+}
+
+async function loadDetails() {
+    for (let i = 0; i < allPokemon.length; i += 50) {
+        const batch = allPokemon.slice(i, i + 50);
+        await Promise.all(batch.map(async (p) => {
+            if (p.isVariant) return;
+            try {
+                const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${p.id}`).then(r => r.json());
+                const spec = await fetch(res.species.url).then(r => r.json());
+                p.nameFR = spec.names.find(n => n.language.name === 'fr')?.name || res.name;
+                p.types = res.types.map(t => typeFR[t.type.name] || t.type.name);
+                
+                if(spec.varieties && spec.varieties.length > 1) {
+                    for(let v of spec.varieties) {
+                        const vId = parseInt(v.pokemon.url.split('/').filter(Boolean).pop());
+                        if(vId > 10000 || (p.id === 386 && vId !== 386)) {
+                            const vRes = await fetch(v.pokemon.url).then(r => r.json());
+                            let tag = null, vn = vRes.name.toLowerCase();
+                            if(vn.includes('mega')) tag = "mega"; 
+                            else if(vn.includes('gmax')) tag = "gmax"; 
+                            else if(vn.includes('alola')) tag = "alola"; 
+                            else if(vn.includes('galar')) tag = "galar"; 
+                            else if(vn.includes('hisui')) tag = "hisui";
+                            else if(vn.includes('rotom-')) tag = "rotom";
+                            else if(vn.includes('deoxys-')) tag = "deoxys";
+                            if(tag) {
+                                allPokemon.push({ 
+                                    id: vId, parentId: p.id, nameFR: p.nameFR, 
+                                    suffix: vn.replace('deoxys-', '').replace(spec.name, "").replace(/-/g, " ").trim(), 
+                                    types: vRes.types.map(t => typeFR[t.type.name] || t.type.name), 
+                                    img: vRes.sprites.other['official-artwork'].front_default || p.img, 
+                                    isVariant: true, variantType: tag 
+                                });
+                            }
+                        }
+                    }
+                }
+            } catch(e){}
+        }));
+        if(currentPage === 1) renderPokedex();
+    }
+}
+
+function renderPokedex() {
+    const s = document.getElementById('search').value.toLowerCase();
+    const r = document.getElementById('region').value;
+    let filtered = allPokemon.filter(p => {
+        const nMatch = (p.nameFR || "").toLowerCase().includes(s) || String(p.id).includes(s);
+        let rMatch = true;
+        if(r !== 'all') { const [min, max] = r.split('-').map(Number); rMatch = (p.parentId || p.id) >= min && (p.parentId || p.id) <= max; }
+        const sMatch = !activeSpecial || p.variantType === activeSpecial || (activeSpecial === 'deoxys' && p.id === 386);
+        return nMatch && rMatch && sMatch;
+    });
+
+    const uniqueMap = new Map();
+    filtered.forEach(p => uniqueMap.set(p.id, p));
+    filtered = Array.from(uniqueMap.values());
+    
+    if(activeSpecial) filtered.sort((a, b) => (a.nameFR || "").localeCompare(b.nameFR || ""));
+    else filtered.sort((a, b) => a.id - b.id);
+
+    const selection = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
+    document.getElementById('grid').innerHTML = selection.map(p => {
+        const c1 = colors[p.types[0]] || '#334155', c2 = p.types[1] ? colors[p.types[1]] : c1;
+        const bg = (p.types.length === 2) ? `linear-gradient(135deg, ${c1} 50%, ${c2} 50%)` : c1;
+        return `<div class="card" style="background:${bg}" onclick="openModal(${p.id}, '${p.nameFR}')">
+            <img src="${p.img}" loading="lazy">
+            <div class="card-info">
+                <h3>${p.nameFR || 'Analyse...'}</h3>
+                <div>${p.types.map(t => `<span class="type-badge" style="background:${colors[t]}">${t}</span>`).join('')}</div>
+                ${p.suffix ? `<div class="variant-tag">${p.suffix.toUpperCase()}</div>` : `<div style="font-size:0.7rem; opacity:0.7; margin-top:5px;">#${p.id}</div>`}
+            </div>
+        </div>`;
+    }).join('');
+    renderPagination(Math.ceil(filtered.length / perPage));
+}
+
+async function openModal(id, name) {
+    document.getElementById('modal').style.display = 'flex';
+    const body = document.getElementById('modal-body');
+    body.innerHTML = "<p>Extraction des données génétiques...</p>";
+    try {
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(r => r.json());
+        const spec = await fetch(res.species.url).then(r => r.json());
+        const desc = spec.flavor_text_entries.find(e => e.language.name === 'fr')?.flavor_text.replace(/\f/g, ' ') || "Aucune donnée de terrain.";
+        const category = spec.genera.find(g => g.language.name === 'fr')?.genus || "Inconnu";
+        body.innerHTML = `
+            <h2 style="color:var(--accent); margin-bottom:5px;">${name}</h2>
+            <div style="color:#94a3b8; font-size:0.9rem; margin-bottom:15px;">Classification : ${category}</div>
+            <img src="${res.sprites.other['official-artwork'].front_default}" style="width:180px; margin-bottom:15px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; background:rgba(255,255,255,0.05); padding:12px; border-radius:15px; margin-bottom:15px;">
+                <div><small>TAILLE</small><br><strong>${res.height/10} m</strong></div>
+                <div><small>POIDS</small><br><strong>${res.weight/10} kg</strong></div>
+            </div>
+            <div class="modal-desc">${desc}</div>
+            <div style="margin-top:20px;">
+                ${res.stats.map(s => `
+                    <div style="margin-bottom:8px; text-align:left;">
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem;"><span>${s.stat.name.toUpperCase()}</span><span>${s.base_stat}</span></div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${Math.min(s.base_stat/2, 100)}%;"></div></div>
+                    </div>`).join('')}
+            </div>`;
+    } catch(e) { body.innerHTML = "Échec de la connexion au serveur."; }
+}
+
+let correctQuizName = "";
+async function resetQuiz() {
+    const opt = document.getElementById('quiz-options'); const img = document.getElementById('quiz-img'); const next = document.getElementById('next-quiz');
+    opt.innerHTML = "Initialisation..."; img.classList.remove('reveal'); next.style.display = "none";
+    const rid = Math.floor(Math.random() * 1000) + 1;
+    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${rid}`).then(r => r.json());
+    const spec = await fetch(res.species.url).then(r => r.json());
+    correctQuizName = spec.names.find(n => n.language.name === 'fr')?.name || res.name;
+    img.src = res.sprites.other['official-artwork'].front_default;
+    let choices = [correctQuizName]; 
+    while(choices.length < 4) { 
+        let rP = allPokemon[Math.floor(Math.random() * 1025)];
+        if(rP.nameFR && !choices.includes(rP.nameFR)) choices.push(rP.nameFR); 
+    }
+    choices.sort(() => Math.random() - 0.5);
+    opt.innerHTML = choices.map(n => `<button class="quiz-btn" onclick="checkQuiz(this, '${n}')">${n}</button>`).join('');
+}
+
+function checkQuiz(btn, name) {
+    document.getElementById('quiz-img').classList.add('reveal');
+    document.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
+    if(name === correctQuizName) btn.classList.add('correct');
+    else { btn.style.background = "#ef4444"; document.querySelectorAll('.quiz-btn').forEach(b => { if(b.innerText === correctQuizName) b.classList.add('correct'); }); }
+    document.getElementById('next-quiz').style.display = "block";
+}
+
+function toggleSpecial(t) {
+    activeSpecial = (activeSpecial === t) ? null : t;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    if(activeSpecial) document.getElementById(`f-${t}`).classList.add('active');
+    currentPage = 1; renderPokedex();
+}
+
+function showPage(id, el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.getElementById(id).classList.add('active'); el.classList.add('active');
+}
+
+function renderPagination(t) {
+    const c = document.getElementById('pagination'); c.innerHTML = '';
+    let start = Math.max(1, currentPage - 4); let end = Math.min(t, start + 8);
+    for(let i=start; i<=end; i++) {
+        const b = document.createElement('div'); b.className = `page-btn ${i===currentPage?'active':''}`; b.textContent = i;
+        b.onclick = () => { currentPage = i; renderPokedex(); window.scrollTo({top: 500, behavior: 'smooth'}); }; c.appendChild(b);
+    }
+}
+
+init();
+</script>
+</body>
+</html>
