@@ -5,7 +5,7 @@
     <title>PokéMedia v9.9.5 — Bio-Terminal Final</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        :root{--bg:#020617;--card:#111827;--text:#e5e7eb;--accent:#22c55e;--accent-glow:rgba(34, 197, 94, 0.4);--danger:#ef4444;}
+        :root{--bg:#020617;--card:#111827;--text:#e5e7eb;--accent:#22c55e;--accent-glow:rgba(34, 197, 94, 0.4);--danger:#ef4444;--shiny:#facc15;}
         *{box-sizing:border-box; transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);}
         body{margin:0;font-family: 'Segoe UI', system-ui, sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
         
@@ -17,7 +17,7 @@
         .page.active { display: block; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- INTRO NARRATIVE RESTAURÉE --- */
+        /* --- INTRO NARRATIVE V9.9.5 --- */
         .intro-header { 
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.8)); 
             padding: 3.5rem; border-radius: 40px; margin-bottom: 2.5rem; 
@@ -46,6 +46,7 @@
         .dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; display: inline-block; animation: blink 1s infinite; box-shadow: 0 0 10px var(--accent); }
         @keyframes blink { 0%, 100% { opacity: 1; transform: scale(1.1); } 50% { opacity: 0.3; transform: scale(0.9); } }
 
+        /* --- FILTRES & GRID --- */
         .controls-panel { background: #0f172a; border-radius: 24px; margin-bottom: 2rem; border: 1px solid rgba(255,255,255,0.05); padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .search-row { display: flex; gap: 15px; margin-bottom: 15px; }
         input { flex: 3; padding: 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: #1e293b; color: white; outline: none; font-size: 1rem; }
@@ -64,9 +65,12 @@
         .type-tag { display: inline-block; padding: 5px 12px; border-radius: 10px; font-size: 0.65rem; font-weight: 800; color: white; text-transform: uppercase; margin: 2px; }
         .form-label { position: absolute; top: 20px; right: 20px; background: rgba(34, 197, 94, 0.2); backdrop-filter: blur(5px); color: var(--accent); padding: 5px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; border: 1px solid var(--accent); z-index: 5; }
 
+        /* --- MODAL & SHINY BUTTON --- */
         #modal { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; backdrop-filter: blur(15px); }
         .modal-inner { background: #0f172a; padding: 3rem; border-radius: 55px; width: 100%; max-width: 550px; text-align: center; border: 1px solid var(--accent); max-height: 90vh; overflow-y: auto; }
-        .shiny-toggle { background: #1e293b; color: white; border: 1px solid var(--accent); padding: 14px 28px; border-radius: 25px; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
+        
+        .shiny-toggle { background: #1e293b; color: white; border: 1px solid var(--accent); padding: 14px 28px; border-radius: 25px; cursor: pointer; font-weight: bold; margin-bottom: 20px; font-size: 0.85rem; letter-spacing: 1px; }
+        .shiny-toggle.active { background: var(--shiny); color: black; border-color: var(--shiny); box-shadow: 0 0 20px rgba(250, 204, 21, 0.3); }
 
         .pagination { display: flex; justify-content: center; gap: 12px; margin: 5rem 0; flex-wrap: wrap; }
         .p-btn { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: #1e293b; border-radius: 15px; cursor: pointer; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); }
@@ -103,7 +107,7 @@
 
     <div class="controls-panel">
         <div class="search-row">
-            <input id="search" placeholder="Saisir un nom d'espèce..." oninput="currentPage=1;render()">
+            <input id="search" placeholder="Nom, forme ou type pour analyse..." oninput="currentPage=1;render()">
             <select id="region" onchange="currentPage=1;render()">
                 <option value="all">Index National</option>
                 <option value="899-1025">Paldea</option>
@@ -296,8 +300,18 @@ function resetAll() {
     currentPage = 1; render();
 }
 
-function toggleS() { sImg.is = !sImg.is; document.getElementById('m-img').src = sImg.is ? sImg.s : sImg.n; document.getElementById('stog').classList.toggle('active'); }
-function showTab(id, btn) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); }
+function toggleS() { 
+    sImg.is = !sImg.is; 
+    document.getElementById('m-img').src = sImg.is ? sImg.s : sImg.n; 
+    document.getElementById('stog').classList.toggle('active'); 
+}
+
+function showTab(id, btn) { 
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
+    document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active')); 
+    document.getElementById(id).classList.add('active'); 
+    btn.classList.add('active'); 
+}
 
 async function resetQuiz() {
     const img = document.getElementById('q-img');
