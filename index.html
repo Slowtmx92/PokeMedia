@@ -2,111 +2,129 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>PokéMedia — L'Encyclopédie Bio-Analytique</title>
+    <title>PokéMedia v9.9.5 — Bio-Terminal & Physical Metrics</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        :root{--bg:#020617;--card:#111827;--text:#e5e7eb;--accent:#22c55e;}
+        :root{--bg:#020617;--card:#111827;--text:#e5e7eb;--accent:#22c55e;--accent-glow:rgba(34, 197, 94, 0.4);--danger:#ef4444;}
         *{box-sizing:border-box; transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);}
         body{margin:0;font-family: 'Segoe UI', system-ui, sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
         
-        /* Navigation */
-        nav { background: #0f172a; display: flex; justify-content: center; gap: 15px; padding: 1rem; position: sticky; top: 0; z-index: 1000; border-bottom: 2px solid var(--accent); }
-        .nav-link { color: white; text-decoration: none; font-weight: bold; padding: 10px 20px; border-radius: 10px; cursor: pointer; border: none; background: transparent; }
-        .nav-link.active { background: var(--accent); color: black; }
+        nav { background: #0f172a; display: flex; justify-content: center; gap: 15px; padding: 1rem; position: sticky; top: 0; z-index: 1000; border-bottom: 2px solid var(--accent); box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .nav-link { color: white; border:none; background:transparent; font-weight: bold; padding: 10px 20px; border-radius: 10px; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        .nav-link.active { background: var(--accent); color: black; box-shadow: 0 0 15px var(--accent-glow); }
 
-        .page { display: none; padding: 20px; max-width: 1400px; margin: auto; animation: fadeIn 0.4s ease; }
+        .page { display: none; padding: 20px; max-width: 1400px; margin: auto; animation: slideIn 0.5s ease; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Introduction Complexe */
-        .intro-header { background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8)); padding: 3rem; border-radius: 40px; margin-bottom: 2.5rem; border: 1px solid rgba(34, 197, 94, 0.2); position: relative; overflow: hidden; border-left: 8px solid var(--accent); }
-        .intro-header h1 { margin: 0; font-size: 2.8rem; letter-spacing: -1px; color: var(--accent); }
-        .intro-header p { font-size: 1.1rem; max-width: 800px; line-height: 1.7; color: #94a3b8; margin: 15px 0; }
-        .stats-overview { display: flex; gap: 30px; margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
-        .stat-item { display: flex; flex-direction: column; }
-        .stat-value { font-size: 1.8rem; font-weight: 800; color: white; }
-        .stat-label { font-size: 0.8rem; text-transform: uppercase; color: var(--accent); letter-spacing: 1px; }
+        /* --- INTRO ANIMÉE RESTAURÉE --- */
+        .intro-header { 
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.8)); 
+            padding: 3.5rem; border-radius: 40px; margin-bottom: 2.5rem; 
+            border: 1px solid rgba(34, 197, 94, 0.1); position: relative; 
+            border-left: 10px solid var(--accent); overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            animation: borderPulse 4s infinite;
+        }
+        @keyframes borderPulse { 0%, 100% { border-left-color: var(--accent); } 50% { border-left-color: #4ade80; } }
 
-        /* Filtres */
-        #controls-wrapper { background: #0f172a; border-radius: 24px; margin-bottom: 2rem; border: 1px solid rgba(255,255,255,0.1); padding: 1.5rem; }
-        .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        input, select { padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: #1e293b; color: white; width: 100%; outline: none; }
-        .special-filters { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; justify-content: center; }
-        .filter-chip { padding: 8px 18px; border-radius: 20px; background: #1e293b; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-size: 0.85rem; font-weight: bold; color: #94a3b8; }
-        .filter-chip.active { background: var(--accent); color: black; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); border-color: var(--accent); }
+        .intro-header::before {
+            content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(34, 197, 94, 0.03) 0%, transparent 70%);
+            animation: rotateBg 20s linear infinite; z-index: 0;
+        }
+        @keyframes rotateBg { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* Grille & Cartes */
-        #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px,1fr)); gap: 1.5rem; }
-        .card { border-radius: 28px; padding: 1.5rem; text-align: center; cursor: pointer; position: relative; height: 380px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 3px solid rgba(255,255,255,0.1); overflow: hidden; background: #1e293b; }
-        .card:hover { transform: translateY(-8px); border-color: white; filter: brightness(1.1); }
-        .card img { width: 160px; height: 160px; object-fit: contain; z-index: 2; filter: drop-shadow(0 8px 10px rgba(0,0,0,0.3)); }
-        .card-info { width: 100%; background: rgba(0,0,0,0.6); padding: 12px; border-radius: 20px; backdrop-filter: blur(8px); z-index: 2; }
-        .type-badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; color: white; text-transform: uppercase; margin: 2px; }
-        .variant-tag { background: var(--accent); color: black; font-size: 0.65rem; font-weight: 900; padding: 3px 8px; border-radius: 5px; margin-top: 5px; display: inline-block; }
+        .intro-content { position: relative; z-index: 1; }
+        .version-tag { background: var(--accent); color: black; padding: 4px 12px; border-radius: 6px; font-weight: 900; font-size: 0.7rem; vertical-align: middle; margin-left: 15px; box-shadow: 0 0 15px var(--accent); }
+        .intro-header h1 { margin: 0; font-size: 3.8rem; color: #fff; text-transform: uppercase; letter-spacing: -3px; text-shadow: 0 0 20px var(--accent-glow); }
+        .intro-desc { font-size: 1.2rem; color: #94a3b8; margin: 25px 0; line-height: 1.8; max-width: 950px; }
+        .intro-desc b { color: var(--accent); text-shadow: 0 0 5px var(--accent-glow); }
 
-        /* Quiz */
-        .quiz-container { max-width: 600px; margin: 40px auto; background: #0f172a; padding: 30px; border-radius: 35px; border: 2px solid var(--accent); text-align: center; }
-        .quiz-img { width: 220px; height: 220px; filter: brightness(0); transition: 0.5s; margin-bottom: 20px; }
-        .quiz-img.reveal { filter: brightness(1); }
-        .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .quiz-btn { padding: 15px; border-radius: 12px; border: 2px solid #1e293b; background: #1e293b; color: white; cursor: pointer; font-weight: bold; }
-        .quiz-btn.correct { background: var(--accent) !important; color: black !important; }
+        .status-bar { display: flex; gap: 20px; margin-bottom: 25px; }
+        .status-item { font-size: 0.75rem; font-weight: bold; letter-spacing: 2px; display: flex; align-items: center; gap: 8px; color: #64748b; }
+        .dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; display: inline-block; animation: blink 1s infinite; box-shadow: 0 0 10px var(--accent); }
+        @keyframes blink { 0%, 100% { opacity: 1; transform: scale(1.1); } 50% { opacity: 0.3; transform: scale(0.9); } }
 
-        /* Modal */
-        #modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
-        .modal-box { background: #0f172a; padding: 2.5rem; border-radius: 35px; width: 100%; max-width: 550px; text-align: center; border: 1px solid var(--accent); max-height: 90vh; overflow-y: auto; }
-        .modal-desc { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin: 15px 0; font-style: italic; font-size: 0.95rem; text-align: left; border-left: 4px solid var(--accent); }
-        .stat-bar-bg { background: #1e293b; height: 10px; border-radius: 5px; margin-top: 4px; overflow: hidden; }
-        .stat-bar-fill { height: 100%; background: var(--accent); }
+        /* --- CONTROLS --- */
+        .controls-panel { background: #0f172a; border-radius: 24px; margin-bottom: 2rem; border: 1px solid rgba(255,255,255,0.05); padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .search-row { display: flex; gap: 15px; margin-bottom: 15px; }
+        input { flex: 3; padding: 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: #1e293b; color: white; outline: none; font-size: 1rem; }
+        select { flex: 1.5; padding: 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: #1e293b; color: white; cursor: pointer; }
+        .btn-reset { background: #1e293b; color: var(--danger); border: 2px solid var(--danger); padding: 0 25px; border-radius: 14px; cursor: pointer; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-reset:hover { background: var(--danger); color: white; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+        
+        .chips-list { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .chip { padding: 10px 20px; border-radius: 20px; background: #1e293b; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; font-size: 0.85rem; font-weight: bold; color: #64748b; }
+        .chip.active { background: var(--accent); color: black; box-shadow: 0 5px 15px var(--accent-glow); transform: translateY(-2px); }
 
-        .pagination { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 2rem 0; }
-        .page-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #1e293b; border-radius: 10px; cursor: pointer; font-weight: bold; }
-        .page-btn.active { background: var(--accent); color: black; }
+        /* --- GRID & CARDS --- */
+        #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 2rem; }
+        .card { border-radius: 40px; padding: 1.8rem; text-align: center; cursor: pointer; height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 2px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; background: #111827; }
+        .card:hover { transform: translateY(-12px); border-color: rgba(255,255,255,0.3); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .card img { width: 175px; height: 175px; z-index: 2; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.6)); }
+        
+        .card-info { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px; border-radius: 25px; backdrop-filter: blur(12px); z-index: 2; border: 1px solid rgba(255,255,255,0.1); }
+        .type-tag { display: inline-block; padding: 5px 12px; border-radius: 10px; font-size: 0.65rem; font-weight: 800; color: white; text-transform: uppercase; margin: 2px; }
+        .var-badge { background: #facc15; color: black; font-size: 0.6rem; font-weight: 900; padding: 3px 10px; border-radius: 6px; margin-top: 10px; display: inline-block; letter-spacing: 1px; }
+
+        /* --- MODAL --- */
+        #modal { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; backdrop-filter: blur(15px); }
+        .modal-inner { background: #0f172a; padding: 3.5rem; border-radius: 55px; width: 100%; max-width: 550px; text-align: center; border: 1px solid var(--accent); max-height: 90vh; overflow-y: auto; box-shadow: 0 0 100px rgba(0,0,0,0.8); }
+        .shiny-toggle { background: #1e293b; color: white; border: 1px solid var(--accent); padding: 14px 28px; border-radius: 25px; cursor: pointer; font-weight: bold; margin-bottom: 20px; font-size: 0.85rem; }
+        .shiny-toggle.active { background: #facc15; color: black; border-color: #facc15; }
+
+        .pagination { display: flex; justify-content: center; gap: 12px; margin: 5rem 0; flex-wrap: wrap; }
+        .p-btn { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: #1e293b; border-radius: 15px; cursor: pointer; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); }
+        .p-btn.active { background: var(--accent); color: black; transform: scale(1.1); box-shadow: 0 0 15px var(--accent-glow); }
     </style>
 </head>
 <body>
 
 <nav>
-    <button class="nav-link active" onclick="showPage('pokedex', this)">📕 Encyclopédie</button>
-    <button class="nav-link" onclick="showPage('quiz', this); resetQuiz()">❓ Quiz Interactif</button>
+    <button class="nav-link active" onclick="showTab('pokedex', this)">📕 Encyclopédie</button>
+    <button class="nav-link" onclick="showTab('quiz', this); resetQuiz()">❓ Module Quiz</button>
 </nav>
 
 <div id="pokedex" class="page active">
     <div class="intro-header">
-        <h1>Système PokéMedia v9.2</h1>
-        <p>Accès autorisé. Base de données synchronisée avec le Global Link. Analyse biologique et taxonomique des spécimens répertoriés de Kanto à Paldea.</p>
-        <div class="stats-overview">
-            <div class="stat-item"><span class="stat-value">1025</span><span class="stat-label">Spécimens</span></div>
-            <div class="stat-item"><span class="stat-value">18</span><span class="stat-label">Types Elém.</span></div>
-            <div class="stat-item"><span class="stat-value">9</span><span class="stat-label">Générations</span></div>
+        <div class="intro-content">
+            <div class="status-bar">
+                <div class="status-item" style="color:var(--accent)"><span class="dot"></span> SYSTEM ONLINE</div>
+                <div class="status-item">DB_VER: 9.9.5</div>
+                <div class="status-item">STATUS: SECURE</div>
+            </div>
+            <h1>PokéMedia<span class="version-tag">V9.9.5</span></h1>
+            <div class="intro-desc">
+                Bienvenue dans l'interface de <b>Bio-Analyse Avancée</b>. Ce terminal indexe les données cellulaires de 1025 espèces identifiées. 
+                Grâce au nouveau protocole <b>Deep-Search</b>, toute recherche nominative débloque instantanément les chaînes de variantes alternatives, 
+                incluant les spécimens <b>instables</b> (Deoxys), <b>plasmatiques</b> (Motisma) et les augmentations <b>Méga-Évolutives</b>.
+            </div>
+            <div style="display:flex; gap:40px; margin-top:20px;">
+                <div><small style="display:block; color:var(--accent); font-weight:bold; font-size:0.65rem; letter-spacing:1px;">FLUX DE DONNÉES</small><strong id="st-total" style="font-size:1.8rem;">0</strong></div>
+                <div><small style="display:block; color:var(--accent); font-weight:bold; font-size:0.65rem; letter-spacing:1px;">LATENCE SÉQUENCE</small><strong style="font-size:1.8rem;">12ms</strong></div>
+            </div>
         </div>
     </div>
 
-    <div id="controls-wrapper">
-        <div class="controls-grid">
-            <input id="search" placeholder="Rechercher un spécimen (Nom ou ID)..." oninput="currentPage=1;renderPokedex()">
-            <select id="region" onchange="currentPage=1;renderPokedex()">
-                <option value="all">Index National Complet</option>
-                <option value="1-151">Gén. 1 - Kanto</option>
-                <option value="152-251">Gén. 2 - Johto</option>
-                <option value="252-386">Gén. 3 - Hoenn</option>
-                <option value="387-493">Gén. 4 - Sinnoh</option>
-                <option value="494-649">Gén. 5 - Unys</option>
-                <option value="650-721">Gén. 6 - Kalos</option>
-                <option value="722-809">Gén. 7 - Alola</option>
-                <option value="810-898">Gén. 8 - Galar</option>
-                <option value="899-1025">Gén. 9 - Paldea</option>
+    <div class="controls-panel">
+        <div class="search-row">
+            <input id="search" placeholder="Analyser une espèce..." oninput="currentPage=1;render()">
+            <select id="region" onchange="currentPage=1;render()">
+                <option value="all">Index National</option>
+                <option value="1-151">Kanto</option>
+                <option value="152-251">Johto</option>
+                <option value="252-386">Hoenn</option>
+                <option value="387-493">Sinnoh</option>
+                <option value="494-649">Unys</option>
+                <option value="650-721">Kalos</option>
+                <option value="722-809">Alola</option>
+                <option value="810-898">Galar</option>
+                <option value="899-1025">Paldea</option>
             </select>
+            <button class="btn-reset" onclick="resetAll()">Reset System</button>
         </div>
-        <div class="special-filters">
-            <div class="filter-chip" id="f-deoxys" onclick="toggleSpecial('deoxys')">🌀 Deoxys</div>
-            <div class="filter-chip" id="f-mega" onclick="toggleSpecial('mega')">✨ Méga-Évolutions</div>
-            <div class="filter-chip" id="f-gmax" onclick="toggleSpecial('gmax')">🔥 Gigamax</div>
-            <div class="filter-chip" id="f-alola" onclick="toggleSpecial('alola')">🏝️ Formes Alola</div>
-            <div class="filter-chip" id="f-galar" onclick="toggleSpecial('galar')">🛡️ Formes Galar</div>
-            <div class="filter-chip" id="f-hisui" onclick="toggleSpecial('hisui')">📜 Formes Hisui</div>
-            <div class="filter-chip" id="f-rotom" onclick="toggleSpecial('rotom')">⚙️ Motisma</div>
-        </div>
+        <div class="chips-list" id="filter-box"></div>
     </div>
     
     <div id="grid"></div>
@@ -114,183 +132,187 @@
 </div>
 
 <div id="quiz" class="page">
-    <div class="quiz-container">
-        <h2 style="color: var(--accent);">IDENTIFICATION DE SILHOUETTE</h2>
-        <img id="quiz-img" class="quiz-img" src="">
-        <div id="quiz-options" class="quiz-options"></div>
-        <button id="next-quiz" onclick="resetQuiz()" style="display:none; margin: 20px auto 0; background: var(--accent); color: black; border: none; padding: 12px 30px; border-radius: 12px; font-weight: bold; cursor: pointer;">SÉQUENCE SUIVANTE</button>
+    <div style="text-align:center; padding: 60px;">
+        <h2 style="color:var(--accent); letter-spacing:4px; font-size:2rem;">DÉCRYPTAGE VISUEL</h2>
+        <img id="q-img" style="width:280px; filter:brightness(0); transition:0.8s; margin-bottom:40px;">
+        <div id="q-opts" style="display:grid; grid-template-columns:1fr 1fr; gap:25px; max-width:650px; margin:auto;"></div>
+        <button id="q-next" onclick="resetQuiz()" style="display:none; margin-top:40px; padding:20px 50px; background:var(--accent); border:none; border-radius:18px; font-weight:bold; cursor:pointer; color:black;">SUIVANT</button>
     </div>
 </div>
 
-<div id="modal" onclick="this.style.display='none'"><div class="modal-box" onclick="event.stopPropagation()"><div id="modal-body"></div></div></div>
+<div id="modal" onclick="this.style.display='none'"><div class="modal-inner" onclick="event.stopPropagation()" id="m-content"></div></div>
 
 <script>
-let currentPage = 1, perPage = 48, allPokemon = [], activeSpecial = null;
-const typeFR = {fire:'Feu',water:'Eau',grass:'Plante',normal:'Normal',electric:'Electrik',fighting:'Combat',poison:'Poison',ground:'Sol',flying:'Vol',psychic:'Psy',bug:'Insecte',rock:'Roche',ghost:'Spectre',dragon:'Dragon',dark:'Ténèbres',steel:'Acier',fairy:'Fée',ice:'Glace'};
-const colors = {Feu:'#EE8130',Eau:'#6390F0',Plante:'#7AC74C',Normal:'#A8A77A',Electrik:'#F7D02C',Combat:'#C22E28',Poison:'#A33EA1',Sol:'#E2BF65',Vol:'#A98FF3',Psy:'#F95587',Insecte:'#A6B91A',Roche:'#B6A136',Spectre:'#735797',Dragon:'#6F35FC',Ténèbres:'#705746',Acier:'#B7B7CE',Fée:'#D685AD',Glace:'#96D9D6'};
+let allPk = [], currentPage = 1, perPage = 48, activeFilter = null;
+let sImg = { n: "", s: "", is: false };
+
+const tMap = {fire:'Feu',water:'Eau',grass:'Plante',normal:'Normal',electric:'Electrik',fighting:'Combat',poison:'Poison',ground:'Sol',flying:'Vol',psychic:'Psy',bug:'Insecte',rock:'Roche',ghost:'Spectre',dragon:'Dragon',dark:'Ténèbres',steel:'Acier',fairy:'Fée',ice:'Glace'};
+const cMap = {Feu:'#EE8130',Eau:'#6390F0',Plante:'#7AC74C',Normal:'#A8A77A',Electrik:'#F7D02C',Combat:'#C22E28',Poison:'#A33EA1',Sol:'#E2BF65',Vol:'#A98FF3',Psy:'#F95587',Insecte:'#A6B91A',Roche:'#B6A136',Spectre:'#735797',Dragon:'#6F35FC',Ténèbres:'#705746',Acier:'#B7B7CE',Fée:'#D685AD',Glace:'#96D9D6'};
+const fMap = { alola:"🏝️ Alola", deoxys:"🧬 Deoxys", galar:"🛡️ Galar", gmax:"🔥 Gigamax", hisui:"📜 Hisui", mega:"✨ Méga", motisma:"🔌 Motisma", paldea:"🍇 Paldea" };
+
+const formNames = {
+    'deoxys-attack': 'Attaque', 'deoxys-defense': 'Défense', 'deoxys-speed': 'Vitesse',
+    'rotom-heat': 'Chaleur', 'rotom-wash': 'Lavage', 'rotom-frost': 'Froid', 'rotom-fan': 'Hélice', 'rotom-mow': 'Tonte'
+};
 
 async function init() {
-    for(let i=1; i<=1025; i++) {
-        allPokemon.push({ id: i, nameFR: null, types: [], img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${i}.png`, isVariant: false });
-    }
-    renderPokedex();
-    await loadDetails();
-}
+    const box = document.getElementById('filter-box');
+    Object.keys(fMap).sort().forEach(k => {
+        const d = document.createElement('div'); d.className='chip'; d.innerText=fMap[k];
+        d.onclick=()=>{ activeFilter=(activeFilter===k)?null:k; document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); if(activeFilter) d.classList.add('active'); currentPage=1; render(); };
+        box.appendChild(d);
+    });
 
-async function loadDetails() {
-    for (let i = 0; i < allPokemon.length; i += 50) {
-        const batch = allPokemon.slice(i, i + 50);
+    for(let i=1; i<=1025; i++) {
+        allPk.push({ id: i, name: `N°${i}`, types: [], img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${i}.png`, isV: false });
+    }
+    render();
+
+    for (let i = 0; i < allPk.length; i += 45) {
+        const batch = allPk.slice(i, i + 45);
         await Promise.all(batch.map(async (p) => {
-            if (p.isVariant) return;
+            if (p.isV) return;
             try {
                 const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${p.id}`).then(r => r.json());
                 const spec = await fetch(res.species.url).then(r => r.json());
-                p.nameFR = spec.names.find(n => n.language.name === 'fr')?.name || res.name;
-                p.types = res.types.map(t => typeFR[t.type.name] || t.type.name);
-                
-                if(spec.varieties && spec.varieties.length > 1) {
-                    for(let v of spec.varieties) {
-                        const vId = parseInt(v.pokemon.url.split('/').filter(Boolean).pop());
-                        if(vId > 10000 || (p.id === 386 && vId !== 386)) {
-                            const vRes = await fetch(v.pokemon.url).then(r => r.json());
-                            let tag = null, vn = vRes.name.toLowerCase();
-                            if(vn.includes('mega')) tag = "mega"; 
-                            else if(vn.includes('gmax')) tag = "gmax"; 
-                            else if(vn.includes('alola')) tag = "alola"; 
-                            else if(vn.includes('galar')) tag = "galar"; 
-                            else if(vn.includes('hisui')) tag = "hisui";
-                            else if(vn.includes('rotom-')) tag = "rotom";
-                            else if(vn.includes('deoxys-')) tag = "deoxys";
-                            if(tag) {
-                                allPokemon.push({ 
-                                    id: vId, parentId: p.id, nameFR: p.nameFR, 
-                                    suffix: vn.replace('deoxys-', '').replace(spec.name, "").replace(/-/g, " ").trim(), 
-                                    types: vRes.types.map(t => typeFR[t.type.name] || t.type.name), 
-                                    img: vRes.sprites.other['official-artwork'].front_default || p.img, 
-                                    isVariant: true, variantType: tag 
-                                });
-                            }
-                        }
+                p.name = spec.names.find(n => n.language.name === 'fr')?.name || res.name;
+                p.types = res.types.map(t => tMap[t.type.name] || t.type.name);
+                if(p.name.toLowerCase() === 'deoxys') { p.vType = 'deoxys'; p.subName = 'Normal'; }
+                if(p.name.toLowerCase() === 'motisma') { p.vType = 'motisma'; p.subName = 'Base'; }
+
+                spec.varieties.forEach(v => {
+                    const vId = v.pokemon.url.split('/').filter(Boolean).pop();
+                    const vn = v.pokemon.name.toLowerCase();
+                    let tag = null, subName = null;
+                    if(vn.includes('alola')) tag = 'alola';
+                    else if(vn.includes('galar')) tag = 'galar';
+                    else if(vn.includes('hisui')) tag = 'hisui';
+                    else if(vn.includes('paldea')) tag = 'paldea';
+                    else if(vn.includes('mega')) tag = 'mega';
+                    else if(vn.includes('gmax')) tag = 'gmax';
+                    else if(vn.includes('deoxys-')) { tag = 'deoxys'; subName = formNames[vn] || vn.split('-')[1]; }
+                    else if(vn.includes('rotom-')) { tag = 'motisma'; subName = formNames[vn] || vn.split('-')[1]; }
+
+                    if(tag && vId > 10000 && !allPk.find(x => x.id == vId)) {
+                        allPk.push({ id: vId, parentId: p.id, name: p.name, subName: subName, types: p.types, img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${vId}.png`, isV: true, vType: tag });
                     }
-                }
+                });
             } catch(e){}
         }));
-        if(currentPage === 1) renderPokedex();
+        if(currentPage === 1) render();
     }
 }
 
-function renderPokedex() {
-    const s = document.getElementById('search').value.toLowerCase();
-    const r = document.getElementById('region').value;
-    let filtered = allPokemon.filter(p => {
-        const nMatch = (p.nameFR || "").toLowerCase().includes(s) || String(p.id).includes(s);
-        let rMatch = true;
-        if(r !== 'all') { const [min, max] = r.split('-').map(Number); rMatch = (p.parentId || p.id) >= min && (p.parentId || p.id) <= max; }
-        const sMatch = !activeSpecial || p.variantType === activeSpecial || (activeSpecial === 'deoxys' && p.id === 386);
-        return nMatch && rMatch && sMatch;
+function render() {
+    const query = document.getElementById('search').value.toLowerCase();
+    const region = document.getElementById('region').value;
+    let filtered = allPk.filter(p => {
+        const nameMatch = p.name.toLowerCase().includes(query) || (p.subName && p.subName.toLowerCase().includes(query));
+        const isSpecialForm = ['mega','gmax','deoxys','motisma'].includes(p.vType);
+        if(activeFilter) return p.vType === activeFilter && nameMatch;
+        if(query.length > 1 && nameMatch) return true;
+        if(isSpecialForm && p.id > 10000) return false;
+        let regionMatch = true;
+        if(region !== 'all') {
+            const [min, max] = region.split('-').map(Number);
+            const bId = p.parentId || p.id;
+            regionMatch = (bId >= min && bId <= max);
+        }
+        return nameMatch && regionMatch;
     });
 
-    const uniqueMap = new Map();
-    filtered.forEach(p => uniqueMap.set(p.id, p));
-    filtered = Array.from(uniqueMap.values());
-    
-    if(activeSpecial) filtered.sort((a, b) => (a.nameFR || "").localeCompare(b.nameFR || ""));
-    else filtered.sort((a, b) => a.id - b.id);
-
-    const selection = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
-    document.getElementById('grid').innerHTML = selection.map(p => {
-        const c1 = colors[p.types[0]] || '#334155', c2 = p.types[1] ? colors[p.types[1]] : c1;
-        const bg = (p.types.length === 2) ? `linear-gradient(135deg, ${c1} 50%, ${c2} 50%)` : c1;
-        return `<div class="card" style="background:${bg}" onclick="openModal(${p.id}, '${p.nameFR}')">
+    const grid = document.getElementById('grid');
+    grid.innerHTML = filtered.slice((currentPage-1)*perPage, currentPage*perPage).map(p => {
+        const c1 = cMap[p.types[0]] || '#334155', c2 = p.types[1] ? cMap[p.types[1]] : c1;
+        const displayTitle = p.subName ? `${p.name} (${p.subName})` : p.name;
+        return `<div class="card" style="background:linear-gradient(135deg, ${c1} 50%, ${c2} 50%)" onclick="openM(${p.id}, '${displayTitle}')">
             <img src="${p.img}" loading="lazy">
             <div class="card-info">
-                <h3>${p.nameFR || 'Analyse...'}</h3>
-                <div>${p.types.map(t => `<span class="type-badge" style="background:${colors[t]}">${t}</span>`).join('')}</div>
-                ${p.suffix ? `<div class="variant-tag">${p.suffix.toUpperCase()}</div>` : `<div style="font-size:0.7rem; opacity:0.7; margin-top:5px;">#${p.id}</div>`}
+                <h3 style="margin:5px 0; font-size:1rem; color:white;">${displayTitle}</h3>
+                <div>${p.types.map(t => `<span class="type-tag" style="background:${cMap[t]}">${t}</span>`).join('')}</div>
+                ${p.vType ? `<span class="var-badge">${p.vType.toUpperCase()}</span>` : `<div style="opacity:0.5; font-size:0.75rem;">ID #${p.id}</div>`}
             </div>
         </div>`;
     }).join('');
-    renderPagination(Math.ceil(filtered.length / perPage));
+
+    document.getElementById('st-total').innerText = filtered.length;
+    const total = Math.ceil(filtered.length / perPage);
+    const pag = document.getElementById('pagination'); pag.innerHTML = "";
+    for(let i=Math.max(1, currentPage-2); i<=Math.min(total, currentPage+2); i++){
+        const b = document.createElement('div'); b.className=`p-btn ${i===currentPage?'active':''}`; b.textContent=i;
+        b.onclick=()=>{currentPage=i; render(); window.scrollTo(0,400);}; pag.appendChild(b);
+    }
 }
 
-async function openModal(id, name) {
-    document.getElementById('modal').style.display = 'flex';
-    const body = document.getElementById('modal-body');
-    body.innerHTML = "<p>Extraction des données génétiques...</p>";
+async function openM(id, name) {
+    const box = document.getElementById('m-content');
+    document.getElementById('modal').style.display = "flex";
+    box.innerHTML = "DÉCODAGE...";
     try {
         const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(r => r.json());
         const spec = await fetch(res.species.url).then(r => r.json());
-        const desc = spec.flavor_text_entries.find(e => e.language.name === 'fr')?.flavor_text.replace(/\f/g, ' ') || "Aucune donnée de terrain.";
-        const category = spec.genera.find(g => g.language.name === 'fr')?.genus || "Inconnu";
-        body.innerHTML = `
-            <h2 style="color:var(--accent); margin-bottom:5px;">${name}</h2>
-            <div style="color:#94a3b8; font-size:0.9rem; margin-bottom:15px;">Classification : ${category}</div>
-            <img src="${res.sprites.other['official-artwork'].front_default}" style="width:180px; margin-bottom:15px;">
-            <div style="display:grid; grid-template-columns:1fr 1fr; background:rgba(255,255,255,0.05); padding:12px; border-radius:15px; margin-bottom:15px;">
-                <div><small>TAILLE</small><br><strong>${res.height/10} m</strong></div>
-                <div><small>POIDS</small><br><strong>${res.weight/10} kg</strong></div>
+        const cat = spec.genera.find(g => g.language.name === 'fr')?.genus || "Inconnu";
+        const desc = spec.flavor_text_entries.find(e => e.language.name === 'fr')?.flavor_text.replace(/\f/g, ' ') || "Aucune donnée.";
+        
+        const heightM = res.height / 10;
+        const weightKg = res.weight / 10;
+        sImg = { n: res.sprites.other['official-artwork'].front_default, s: res.sprites.other['official-artwork'].front_shiny || res.sprites.front_shiny, is: false };
+        
+        box.innerHTML = `
+            <h2 style="color:var(--accent); margin:0; font-size:2.4rem;">${name}</h2>
+            <div style="color:#94a3b8; font-weight:bold; letter-spacing:1px; margin-bottom:15px;">${cat}</div>
+            
+            <div style="display:flex; justify-content:center; gap:15px; margin-bottom:20px;">
+                <div style="background:#1e293b; padding:10px 20px; border-radius:15px; border:1px solid rgba(255,255,255,0.1);">
+                    <small style="display:block; color:var(--accent); font-size:0.6rem; font-weight:900;">TAILLE</small>
+                    <span style="font-weight:bold;">${heightM} m</span>
+                </div>
+                <div style="background:#1e293b; padding:10px 20px; border-radius:15px; border:1px solid rgba(255,255,255,0.1);">
+                    <small style="display:block; color:var(--accent); font-size:0.6rem; font-weight:900;">POIDS</small>
+                    <span style="font-weight:bold;">${weightKg} kg</span>
+                </div>
             </div>
-            <div class="modal-desc">${desc}</div>
-            <div style="margin-top:20px;">
-                ${res.stats.map(s => `
-                    <div style="margin-bottom:8px; text-align:left;">
-                        <div style="display:flex; justify-content:space-between; font-size:0.7rem;"><span>${s.stat.name.toUpperCase()}</span><span>${s.base_stat}</span></div>
-                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${Math.min(s.base_stat/2, 100)}%;"></div></div>
+
+            <button class="shiny-toggle" id="stog" onclick="toggleS()">✨ ANALYSE CHROMATIQUE</button>
+            <br><img id="m-img" src="${sImg.n}" style="width:230px; margin:15px 0;">
+            <p style="text-align:left; font-size:0.95rem; line-height:1.6; border-left:6px solid var(--accent); padding-left:25px; color:#94a3b8; margin-bottom:25px;">${desc}</p>
+            <div style="text-align:left;">
+                ${res.stats.map(s=>`
+                    <div style="margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:bold;"><span>${s.stat.name.toUpperCase()}</span><span>${s.base_stat}</span></div>
+                        <div style="background:#1e293b; height:10px; border-radius:5px;"><div style="background:var(--accent); height:100%; width:${Math.min(s.base_stat/2, 100)}%; box-shadow:0 0 10px var(--accent-glow);"></div></div>
                     </div>`).join('')}
             </div>`;
-    } catch(e) { body.innerHTML = "Échec de la connexion au serveur."; }
+    } catch(e) { box.innerHTML = "ERREUR."; }
 }
 
-let correctQuizName = "";
+function resetAll() {
+    document.getElementById('search').value = "";
+    document.getElementById('region').value = "all";
+    activeFilter = null;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    currentPage = 1; render();
+}
+
+function toggleS() { sImg.is = !sImg.is; document.getElementById('m-img').src = sImg.is ? sImg.s : sImg.n; document.getElementById('stog').classList.toggle('active'); }
+function showTab(id, btn) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active')); document.getElementById(id).classList.add('active'); btn.classList.add('active'); }
+
 async function resetQuiz() {
-    const opt = document.getElementById('quiz-options'); const img = document.getElementById('quiz-img'); const next = document.getElementById('next-quiz');
-    opt.innerHTML = "Initialisation..."; img.classList.remove('reveal'); next.style.display = "none";
-    const rid = Math.floor(Math.random() * 1000) + 1;
-    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${rid}`).then(r => r.json());
+    const img = document.getElementById('q-img');
+    img.style.filter = "brightness(0)";
+    document.getElementById('q-next').style.display = "none";
+    const id = Math.floor(Math.random() * 800) + 1;
+    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(r => r.json());
     const spec = await fetch(res.species.url).then(r => r.json());
-    correctQuizName = spec.names.find(n => n.language.name === 'fr')?.name || res.name;
+    const correct = spec.names.find(n => n.language.name === 'fr').name;
     img.src = res.sprites.other['official-artwork'].front_default;
-    let choices = [correctQuizName]; 
-    while(choices.length < 4) { 
-        let rP = allPokemon[Math.floor(Math.random() * 1025)];
-        if(rP.nameFR && !choices.includes(rP.nameFR)) choices.push(rP.nameFR); 
-    }
-    choices.sort(() => Math.random() - 0.5);
-    opt.innerHTML = choices.map(n => `<button class="quiz-btn" onclick="checkQuiz(this, '${n}')">${n}</button>`).join('');
-}
-
-function checkQuiz(btn, name) {
-    document.getElementById('quiz-img').classList.add('reveal');
-    document.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
-    if(name === correctQuizName) btn.classList.add('correct');
-    else { btn.style.background = "#ef4444"; document.querySelectorAll('.quiz-btn').forEach(b => { if(b.innerText === correctQuizName) b.classList.add('correct'); }); }
-    document.getElementById('next-quiz').style.display = "block";
-}
-
-function toggleSpecial(t) {
-    activeSpecial = (activeSpecial === t) ? null : t;
-    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-    if(activeSpecial) document.getElementById(`f-${t}`).classList.add('active');
-    currentPage = 1; renderPokedex();
-}
-
-function showPage(id, el) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    document.getElementById(id).classList.add('active'); el.classList.add('active');
-}
-
-function renderPagination(t) {
-    const c = document.getElementById('pagination'); c.innerHTML = '';
-    let start = Math.max(1, currentPage - 4); let end = Math.min(t, start + 8);
-    for(let i=start; i<=end; i++) {
-        const b = document.createElement('div'); b.className = `page-btn ${i===currentPage?'active':''}`; b.textContent = i;
-        b.onclick = () => { currentPage = i; renderPokedex(); window.scrollTo({top: 500, behavior: 'smooth'}); }; c.appendChild(b);
-    }
+    let ch = [correct];
+    while(ch.length < 4) { let n = allPk[Math.floor(Math.random()*1000)].name; if(n && !ch.includes(n)) ch.push(n); }
+    ch.sort(() => Math.random() - 0.5);
+    document.getElementById('q-opts').innerHTML = ch.map(c => `<button style="padding:20px; background:#1e293b; color:white; border:1px solid #334155; border-radius:18px; cursor:pointer; font-weight:bold;" onclick="this.style.background=( '${c}'==='${correct}'?'var(--accent)':'#ef4444'); document.getElementById('q-img').style.filter='brightness(1)'; document.getElementById('q-next').style.display='block';">${c}</button>`).join('');
 }
 
 init();
 </script>
 </body>
-
 </html>
