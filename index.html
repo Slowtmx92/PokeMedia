@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>PokéMedia v9.9.5 — Bio-Terminal & Physical Metrics</title>
+    <title>PokéMedia v9.9.5 — Bio-Terminal Final</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         :root{--bg:#020617;--card:#111827;--text:#e5e7eb;--accent:#22c55e;--accent-glow:rgba(34, 197, 94, 0.4);--danger:#ef4444;}
@@ -17,7 +17,7 @@
         .page.active { display: block; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- INTRO ANIMÉE RESTAURÉE --- */
+        /* --- INTRO NARRATIVE RESTAURÉE --- */
         .intro-header { 
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.8)); 
             padding: 3.5rem; border-radius: 40px; margin-bottom: 2.5rem; 
@@ -46,37 +46,31 @@
         .dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; display: inline-block; animation: blink 1s infinite; box-shadow: 0 0 10px var(--accent); }
         @keyframes blink { 0%, 100% { opacity: 1; transform: scale(1.1); } 50% { opacity: 0.3; transform: scale(0.9); } }
 
-        /* --- CONTROLS --- */
         .controls-panel { background: #0f172a; border-radius: 24px; margin-bottom: 2rem; border: 1px solid rgba(255,255,255,0.05); padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .search-row { display: flex; gap: 15px; margin-bottom: 15px; }
         input { flex: 3; padding: 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: #1e293b; color: white; outline: none; font-size: 1rem; }
         select { flex: 1.5; padding: 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: #1e293b; color: white; cursor: pointer; }
         .btn-reset { background: #1e293b; color: var(--danger); border: 2px solid var(--danger); padding: 0 25px; border-radius: 14px; cursor: pointer; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-reset:hover { background: var(--danger); color: white; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
         
         .chips-list { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
         .chip { padding: 10px 20px; border-radius: 20px; background: #1e293b; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; font-size: 0.85rem; font-weight: bold; color: #64748b; }
-        .chip.active { background: var(--accent); color: black; box-shadow: 0 5px 15px var(--accent-glow); transform: translateY(-2px); }
+        .chip.active { background: var(--accent); color: black; box-shadow: 0 5px 15px var(--accent-glow); }
 
-        /* --- GRID & CARDS --- */
         #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 2rem; }
-        .card { border-radius: 40px; padding: 1.8rem; text-align: center; cursor: pointer; height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 2px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; background: #111827; }
-        .card:hover { transform: translateY(-12px); border-color: rgba(255,255,255,0.3); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .card { border-radius: 40px; padding: 1.8rem; text-align: center; cursor: pointer; height: 420px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; border: 2px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; background: #111827; }
         .card img { width: 175px; height: 175px; z-index: 2; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.6)); }
         
         .card-info { width: 100%; background: rgba(15, 23, 42, 0.9); padding: 15px; border-radius: 25px; backdrop-filter: blur(12px); z-index: 2; border: 1px solid rgba(255,255,255,0.1); }
         .type-tag { display: inline-block; padding: 5px 12px; border-radius: 10px; font-size: 0.65rem; font-weight: 800; color: white; text-transform: uppercase; margin: 2px; }
-        .var-badge { background: #facc15; color: black; font-size: 0.6rem; font-weight: 900; padding: 3px 10px; border-radius: 6px; margin-top: 10px; display: inline-block; letter-spacing: 1px; }
+        .form-label { position: absolute; top: 20px; right: 20px; background: rgba(34, 197, 94, 0.2); backdrop-filter: blur(5px); color: var(--accent); padding: 5px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; border: 1px solid var(--accent); z-index: 5; }
 
-        /* --- MODAL --- */
         #modal { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; backdrop-filter: blur(15px); }
-        .modal-inner { background: #0f172a; padding: 3.5rem; border-radius: 55px; width: 100%; max-width: 550px; text-align: center; border: 1px solid var(--accent); max-height: 90vh; overflow-y: auto; box-shadow: 0 0 100px rgba(0,0,0,0.8); }
-        .shiny-toggle { background: #1e293b; color: white; border: 1px solid var(--accent); padding: 14px 28px; border-radius: 25px; cursor: pointer; font-weight: bold; margin-bottom: 20px; font-size: 0.85rem; }
-        .shiny-toggle.active { background: #facc15; color: black; border-color: #facc15; }
+        .modal-inner { background: #0f172a; padding: 3rem; border-radius: 55px; width: 100%; max-width: 550px; text-align: center; border: 1px solid var(--accent); max-height: 90vh; overflow-y: auto; }
+        .shiny-toggle { background: #1e293b; color: white; border: 1px solid var(--accent); padding: 14px 28px; border-radius: 25px; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
 
         .pagination { display: flex; justify-content: center; gap: 12px; margin: 5rem 0; flex-wrap: wrap; }
         .p-btn { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: #1e293b; border-radius: 15px; cursor: pointer; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); }
-        .p-btn.active { background: var(--accent); color: black; transform: scale(1.1); box-shadow: 0 0 15px var(--accent-glow); }
+        .p-btn.active { background: var(--accent); color: black; }
     </style>
 </head>
 <body>
@@ -102,16 +96,17 @@
             </div>
             <div style="display:flex; gap:40px; margin-top:20px;">
                 <div><small style="display:block; color:var(--accent); font-weight:bold; font-size:0.65rem; letter-spacing:1px;">FLUX DE DONNÉES</small><strong id="st-total" style="font-size:1.8rem;">0</strong></div>
-                <div><small style="display:block; color:var(--accent); font-weight:bold; font-size:0.65rem; letter-spacing:1px;">LATENCE SÉQUENCE</small><strong style="font-size:1.8rem;">12ms</strong></div>
+                <div><small style="display:block; color:var(--accent); font-weight:bold; font-size:0.65rem; letter-spacing:1px;">LATENCE SÉQUENCE</small><strong style="font-size:1.8rem;">9ms</strong></div>
             </div>
         </div>
     </div>
 
     <div class="controls-panel">
         <div class="search-row">
-            <input id="search" placeholder="Analyser une espèce..." oninput="currentPage=1;render()">
+            <input id="search" placeholder="Saisir un nom d'espèce..." oninput="currentPage=1;render()">
             <select id="region" onchange="currentPage=1;render()">
                 <option value="all">Index National</option>
+                <option value="899-1025">Paldea</option>
                 <option value="1-151">Kanto</option>
                 <option value="152-251">Johto</option>
                 <option value="252-386">Hoenn</option>
@@ -120,9 +115,8 @@
                 <option value="650-721">Kalos</option>
                 <option value="722-809">Alola</option>
                 <option value="810-898">Galar</option>
-                <option value="899-1025">Paldea</option>
             </select>
-            <button class="btn-reset" onclick="resetAll()">Reset System</button>
+            <button class="btn-reset" onclick="resetAll()">RESET</button>
         </div>
         <div class="chips-list" id="filter-box"></div>
     </div>
@@ -133,10 +127,10 @@
 
 <div id="quiz" class="page">
     <div style="text-align:center; padding: 60px;">
-        <h2 style="color:var(--accent); letter-spacing:4px; font-size:2rem;">DÉCRYPTAGE VISUEL</h2>
+        <h2 style="color:var(--accent); letter-spacing:4px;">DÉCRYPTAGE VISUEL</h2>
         <img id="q-img" style="width:280px; filter:brightness(0); transition:0.8s; margin-bottom:40px;">
         <div id="q-opts" style="display:grid; grid-template-columns:1fr 1fr; gap:25px; max-width:650px; margin:auto;"></div>
-        <button id="q-next" onclick="resetQuiz()" style="display:none; margin-top:40px; padding:20px 50px; background:var(--accent); border:none; border-radius:18px; font-weight:bold; cursor:pointer; color:black;">SUIVANT</button>
+        <button id="q-next" onclick="resetQuiz()" style="display:none; margin-top:40px; padding:20px 50px; background:var(--accent); border:none; border-radius:18px; cursor:pointer;">CIBLE SUIVANTE</button>
     </div>
 </div>
 
@@ -152,7 +146,8 @@ const fMap = { alola:"🏝️ Alola", deoxys:"🧬 Deoxys", galar:"🛡️ Galar
 
 const formNames = {
     'deoxys-attack': 'Attaque', 'deoxys-defense': 'Défense', 'deoxys-speed': 'Vitesse',
-    'rotom-heat': 'Chaleur', 'rotom-wash': 'Lavage', 'rotom-frost': 'Froid', 'rotom-fan': 'Hélice', 'rotom-mow': 'Tonte'
+    'rotom-heat': 'Chaleur', 'rotom-wash': 'Lavage', 'rotom-frost': 'Froid', 'rotom-fan': 'Hélice', 'rotom-mow': 'Tonte',
+    'tauros-paldea-combat-breed': 'Combat', 'tauros-paldea-blaze-breed': 'Flamboyante', 'tauros-paldea-aqua-breed': 'Aquatique'
 };
 
 async function init() {
@@ -168,8 +163,8 @@ async function init() {
     }
     render();
 
-    for (let i = 0; i < allPk.length; i += 45) {
-        const batch = allPk.slice(i, i + 45);
+    for (let i = 0; i < allPk.length; i += 50) {
+        const batch = allPk.slice(i, i + 50);
         await Promise.all(batch.map(async (p) => {
             if (p.isV) return;
             try {
@@ -177,26 +172,37 @@ async function init() {
                 const spec = await fetch(res.species.url).then(r => r.json());
                 p.name = spec.names.find(n => n.language.name === 'fr')?.name || res.name;
                 p.types = res.types.map(t => tMap[t.type.name] || t.type.name);
+                
                 if(p.name.toLowerCase() === 'deoxys') { p.vType = 'deoxys'; p.subName = 'Normal'; }
                 if(p.name.toLowerCase() === 'motisma') { p.vType = 'motisma'; p.subName = 'Base'; }
 
-                spec.varieties.forEach(v => {
+                for(const v of spec.varieties) {
                     const vId = v.pokemon.url.split('/').filter(Boolean).pop();
+                    if(vId <= 10000) continue;
+                    
+                    const vRes = await fetch(v.pokemon.url).then(r => r.json());
                     const vn = v.pokemon.name.toLowerCase();
-                    let tag = null, subName = null;
+                    let tag = null, sub = null;
+                    
                     if(vn.includes('alola')) tag = 'alola';
                     else if(vn.includes('galar')) tag = 'galar';
                     else if(vn.includes('hisui')) tag = 'hisui';
                     else if(vn.includes('paldea')) tag = 'paldea';
                     else if(vn.includes('mega')) tag = 'mega';
                     else if(vn.includes('gmax')) tag = 'gmax';
-                    else if(vn.includes('deoxys-')) { tag = 'deoxys'; subName = formNames[vn] || vn.split('-')[1]; }
-                    else if(vn.includes('rotom-')) { tag = 'motisma'; subName = formNames[vn] || vn.split('-')[1]; }
+                    else if(vn.includes('deoxys-')) { tag = 'deoxys'; sub = formNames[vn] || vn.split('-')[1]; }
+                    else if(vn.includes('rotom-')) { tag = 'motisma'; sub = formNames[vn] || vn.split('-')[1]; }
 
-                    if(tag && vId > 10000 && !allPk.find(x => x.id == vId)) {
-                        allPk.push({ id: vId, parentId: p.id, name: p.name, subName: subName, types: p.types, img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${vId}.png`, isV: true, vType: tag });
+                    if(tag) {
+                        if(p.name === "Tauros" && tag === "paldea") sub = formNames[vn] || "Paldea";
+                        allPk.push({ 
+                            id: vId, parentId: p.id, name: p.name, subName: sub, 
+                            types: vRes.types.map(t => tMap[t.type.name] || t.type.name),
+                            img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${vId}.png`, 
+                            isV: true, vType: tag 
+                        });
                     }
-                });
+                }
             } catch(e){}
         }));
         if(currentPage === 1) render();
@@ -208,29 +214,29 @@ function render() {
     const region = document.getElementById('region').value;
     let filtered = allPk.filter(p => {
         const nameMatch = p.name.toLowerCase().includes(query) || (p.subName && p.subName.toLowerCase().includes(query));
-        const isSpecialForm = ['mega','gmax','deoxys','motisma'].includes(p.vType);
+        const isSpec = ['mega','gmax','deoxys','motisma'].includes(p.vType);
         if(activeFilter) return p.vType === activeFilter && nameMatch;
         if(query.length > 1 && nameMatch) return true;
-        if(isSpecialForm && p.id > 10000) return false;
-        let regionMatch = true;
+        if(isSpec && p.id > 10000) return false;
+        let regM = true;
         if(region !== 'all') {
             const [min, max] = region.split('-').map(Number);
             const bId = p.parentId || p.id;
-            regionMatch = (bId >= min && bId <= max);
+            regM = (bId >= min && bId <= max);
         }
-        return nameMatch && regionMatch;
+        return nameMatch && regM;
     });
 
     const grid = document.getElementById('grid');
     grid.innerHTML = filtered.slice((currentPage-1)*perPage, currentPage*perPage).map(p => {
         const c1 = cMap[p.types[0]] || '#334155', c2 = p.types[1] ? cMap[p.types[1]] : c1;
-        const displayTitle = p.subName ? `${p.name} (${p.subName})` : p.name;
-        return `<div class="card" style="background:linear-gradient(135deg, ${c1} 50%, ${c2} 50%)" onclick="openM(${p.id}, '${displayTitle}')">
+        return `<div class="card" style="background:linear-gradient(135deg, ${c1} 50%, ${c2} 50%)" onclick="openM(${p.id}, '${p.subName ? p.name + ' ('+p.subName+')' : p.name}')">
+            ${p.subName ? `<div class="form-label">${p.subName}</div>` : ''}
             <img src="${p.img}" loading="lazy">
             <div class="card-info">
-                <h3 style="margin:5px 0; font-size:1rem; color:white;">${displayTitle}</h3>
+                <h3 style="margin:5px 0; font-size:1.1rem; color:white;">${p.name}</h3>
                 <div>${p.types.map(t => `<span class="type-tag" style="background:${cMap[t]}">${t}</span>`).join('')}</div>
-                ${p.vType ? `<span class="var-badge">${p.vType.toUpperCase()}</span>` : `<div style="opacity:0.5; font-size:0.75rem;">ID #${p.id}</div>`}
+                ${p.vType ? `<div style="font-size:0.6rem; margin-top:5px; font-weight:900; color:var(--accent);">SPECIMEN ${p.vType.toUpperCase()}</div>` : `<div style="opacity:0.5; font-size:0.75rem;">ID #${p.id}</div>`}
             </div>
         </div>`;
     }).join('');
@@ -254,33 +260,29 @@ async function openM(id, name) {
         const cat = spec.genera.find(g => g.language.name === 'fr')?.genus || "Inconnu";
         const desc = spec.flavor_text_entries.find(e => e.language.name === 'fr')?.flavor_text.replace(/\f/g, ' ') || "Aucune donnée.";
         
-        const heightM = res.height / 10;
-        const weightKg = res.weight / 10;
         sImg = { n: res.sprites.other['official-artwork'].front_default, s: res.sprites.other['official-artwork'].front_shiny || res.sprites.front_shiny, is: false };
         
         box.innerHTML = `
             <h2 style="color:var(--accent); margin:0; font-size:2.4rem;">${name}</h2>
             <div style="color:#94a3b8; font-weight:bold; letter-spacing:1px; margin-bottom:15px;">${cat}</div>
-            
             <div style="display:flex; justify-content:center; gap:15px; margin-bottom:20px;">
                 <div style="background:#1e293b; padding:10px 20px; border-radius:15px; border:1px solid rgba(255,255,255,0.1);">
                     <small style="display:block; color:var(--accent); font-size:0.6rem; font-weight:900;">TAILLE</small>
-                    <span style="font-weight:bold;">${heightM} m</span>
+                    <span style="font-weight:bold;">${res.height/10} m</span>
                 </div>
                 <div style="background:#1e293b; padding:10px 20px; border-radius:15px; border:1px solid rgba(255,255,255,0.1);">
                     <small style="display:block; color:var(--accent); font-size:0.6rem; font-weight:900;">POIDS</small>
-                    <span style="font-weight:bold;">${weightKg} kg</span>
+                    <span style="font-weight:bold;">${res.weight/10} kg</span>
                 </div>
             </div>
-
-            <button class="shiny-toggle" id="stog" onclick="toggleS()">✨ ANALYSE CHROMATIQUE</button>
-            <br><img id="m-img" src="${sImg.n}" style="width:230px; margin:15px 0;">
+            <button class="shiny-toggle" id="stog" onclick="toggleS()">✨ ANALYSE CHROMATIQUE</button><br>
+            <img id="m-img" src="${sImg.n}" style="width:230px; margin:15px 0;">
             <p style="text-align:left; font-size:0.95rem; line-height:1.6; border-left:6px solid var(--accent); padding-left:25px; color:#94a3b8; margin-bottom:25px;">${desc}</p>
             <div style="text-align:left;">
                 ${res.stats.map(s=>`
                     <div style="margin-bottom:12px;">
                         <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:bold;"><span>${s.stat.name.toUpperCase()}</span><span>${s.base_stat}</span></div>
-                        <div style="background:#1e293b; height:10px; border-radius:5px;"><div style="background:var(--accent); height:100%; width:${Math.min(s.base_stat/2, 100)}%; box-shadow:0 0 10px var(--accent-glow);"></div></div>
+                        <div style="background:#1e293b; height:10px; border-radius:5px;"><div style="background:var(--accent); height:100%; width:${Math.min(s.base_stat/2, 100)}%;"></div></div>
                     </div>`).join('')}
             </div>`;
     } catch(e) { box.innerHTML = "ERREUR."; }
@@ -309,7 +311,7 @@ async function resetQuiz() {
     let ch = [correct];
     while(ch.length < 4) { let n = allPk[Math.floor(Math.random()*1000)].name; if(n && !ch.includes(n)) ch.push(n); }
     ch.sort(() => Math.random() - 0.5);
-    document.getElementById('q-opts').innerHTML = ch.map(c => `<button style="padding:20px; background:#1e293b; color:white; border:1px solid #334155; border-radius:18px; cursor:pointer; font-weight:bold;" onclick="this.style.background=( '${c}'==='${correct}'?'var(--accent)':'#ef4444'); document.getElementById('q-img').style.filter='brightness(1)'; document.getElementById('q-next').style.display='block';">${c}</button>`).join('');
+    document.getElementById('q-opts').innerHTML = ch.map(c => `<button style="padding:20px; background:#1e293b; color:white; border:1px solid #334155; border-radius:18px; cursor:pointer;" onclick="this.style.background=( '${c}'==='${correct}'?'var(--accent)':'#ef4444'); document.getElementById('q-img').style.filter='brightness(1)'; document.getElementById('q-next').style.display='block';">${c}</button>`).join('');
 }
 
 init();
