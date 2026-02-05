@@ -141,32 +141,51 @@
 <div id="modal" onclick="this.style.display='none'"><div class="modal-inner" onclick="event.stopPropagation()" id="m-content"></div></div>
 
 <script>
+/** * CONFIGURATION ET ETAT GLOBAL
+ * Ce script gère l'appel à la PokéAPI et le rendu dynamique.
+ */
 let allPk = [], currentPage = 1, perPage = 48, activeFilter = null;
 let sImg = { n: "", s: "", is: false };
 
+// Mappage des types et couleurs (Toolkit PokéMedia)
 const tMap = {fire:'Feu',water:'Eau',grass:'Plante',normal:'Normal',electric:'Electrik',fighting:'Combat',poison:'Poison',ground:'Sol',flying:'Vol',psychic:'Psy',bug:'Insecte',rock:'Roche',ghost:'Spectre',dragon:'Dragon',dark:'Ténèbres',steel:'Acier',fairy:'Fée',ice:'Glace'};
-const cMap = {Feu:'#EE8130',Eau:'#6390F0',Plante:'#7AC74C',Normal:'#A8A77A',Electrik:'#F7D02C',Combat:'#C22E28',Poison:'#A33EA1',Sol:'#E2BF65',Vol:'#A98FF3',Psy:'#F95587',Insecte:'#A6B91A',Roche:'#B6A136',Spectre:'#735797',Dragon:'#6F35FC',Ténèbres:'#705746',Acier:'#B7B7CE',Fée:'#D685AD',Glace:'#96D9D6'};
-const fMap = { alola:"🏝️ Alola", deoxys:"🧬 Deoxys", galar:"🛡️ Galar", gmax:"🔥 Gigamax", hisui:"📜 Hisui", mega:"✨ Méga", motisma:"🔌 Motisma", paldea:"🍇 Paldea" };
+const cMap = {Feu:'#EE8130',Eau:'#6390F0',Plante:'#7AC74C',Normal:'#A8A77A',Electrik:'#F7D02C',Combat:'#C22E28',Poison:'#A33EA1',Sol:'#E2BF65',Vol:'#A98FF3',Psy:'#F95587',Insecte:'#A6B91A',Roche:'#B6A136',Spectre:'#735797',Dragon:'#6F35FC',Ténèbres:'#705746',Acier:'#B7B7CE',Fée:'#D685AD',Glace:'#96D9D6',Inconnu:'#334155'};
+const fMap = { alola:"🏝️ Alola", deoxys:"🧬 Deoxys", galar:"🛡️ Galar", gmax:"🔥 Gigamax", hisui:"📜 Hisui", mega:"✨ Méga", motisma:"🔌 Motisma", paldea:"🍇 Paldea", crown:"👑 Suprême" };
 
+// Traduction des formes spécifiques
 const formNames = {
     'deoxys-attack': 'Attaque', 'deoxys-defense': 'Défense', 'deoxys-speed': 'Vitesse',
     'rotom-heat': 'Chaleur', 'rotom-wash': 'Lavage', 'rotom-frost': 'Froid', 'rotom-fan': 'Hélice', 'rotom-mow': 'Tonte',
-    'tauros-paldea-combat-breed': 'Combat', 'tauros-paldea-blaze-breed': 'Flamboyante', 'tauros-paldea-aqua-breed': 'Aquatique'
+    'tauros-paldea-combat-breed': 'Combat', 'tauros-paldea-blaze-breed': 'Flamboyante', 'tauros-paldea-aqua-breed': 'Aquatique',
+    'zacian-crowned': 'Épée Suprême', 'zamazenta-crowned': 'Bouclier Suprême'
 };
 
+/**
+ * INITIALISATION DU TERMINAL
+ */
 async function init() {
+    console.log("Initialisation du Bio-Terminal...");
     const box = document.getElementById('filter-box');
+    
+    // Génération des puces de filtrage
     Object.keys(fMap).sort().forEach(k => {
         const d = document.createElement('div'); d.className='chip'; d.innerText=fMap[k];
-        d.onclick=()=>{ activeFilter=(activeFilter===k)?null:k; document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); if(activeFilter) d.classList.add('active'); currentPage=1; render(); };
+        d.onclick=()=>{ 
+            activeFilter=(activeFilter===k)?null:k; 
+            document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); 
+            if(activeFilter) d.classList.add('active'); 
+            currentPage=1; render(); 
+        };
         box.appendChild(d);
     });
 
+    // Remplissage initial de l'index national
     for(let i=1; i<=1025; i++) {
         allPk.push({ id: i, name: `N°${i}`, types: [], img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${i}.png`, isV: false });
     }
     render();
 
+    // Chargement par paquets pour la fluidité
     for (let i = 0; i < allPk.length; i += 50) {
         const batch = allPk.slice(i, i + 50);
         await Promise.all(batch.map(async (p) => {
@@ -174,31 +193,39 @@ async function init() {
             try {
                 const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${p.id}`).then(r => r.json());
                 const spec = await fetch(res.species.url).then(r => r.json());
+                
                 p.name = spec.names.find(n => n.language.name === 'fr')?.name || res.name;
                 p.types = res.types.map(t => tMap[t.type.name] || t.type.name);
                 
+                // Tags spéciaux pour les bases
                 if(p.name.toLowerCase() === 'deoxys') { p.vType = 'deoxys'; p.subName = 'Normal'; }
                 if(p.name.toLowerCase() === 'motisma') { p.vType = 'motisma'; p.subName = 'Base'; }
+                if(p.name.toLowerCase() === 'zacian' || p.name.toLowerCase() === 'zamazenta') { p.vType = 'galar'; p.subName = 'Héros Aguerri'; }
 
+                // Gestion des Variétés (Formes alternatives)
                 for(const v of spec.varieties) {
                     const vId = v.pokemon.url.split('/').filter(Boolean).pop();
-                    if(vId <= 10000) continue;
+                    if(vId == p.id) continue; // On ne traite pas la forme de base deux fois
                     
                     const vRes = await fetch(v.pokemon.url).then(r => r.json());
                     const vn = v.pokemon.name.toLowerCase();
                     let tag = null, sub = null;
                     
+                    // Logique de détection des tags
                     if(vn.includes('alola')) tag = 'alola';
                     else if(vn.includes('galar')) tag = 'galar';
                     else if(vn.includes('hisui')) tag = 'hisui';
                     else if(vn.includes('paldea')) tag = 'paldea';
                     else if(vn.includes('mega')) tag = 'mega';
                     else if(vn.includes('gmax')) tag = 'gmax';
+                    else if(vn.includes('crowned')) { tag = 'crown'; sub = formNames[vn] || 'Suprême'; }
                     else if(vn.includes('deoxys-')) { tag = 'deoxys'; sub = formNames[vn] || vn.split('-')[1]; }
                     else if(vn.includes('rotom-')) { tag = 'motisma'; sub = formNames[vn] || vn.split('-')[1]; }
 
                     if(tag) {
+                        // Cas particuliers (Tauros, etc)
                         if(p.name === "Tauros" && tag === "paldea") sub = formNames[vn] || "Paldea";
+                        
                         allPk.push({ 
                             id: vId, parentId: p.id, name: p.name, subName: sub, 
                             types: vRes.types.map(t => tMap[t.type.name] || t.type.name),
@@ -207,21 +234,33 @@ async function init() {
                         });
                     }
                 }
-            } catch(e){}
+            } catch(e){ console.warn("Erreur sur ID: " + p.id); }
         }));
         if(currentPage === 1) render();
     }
 }
 
+/**
+ * RENDU DE LA GRILLE
+ */
 function render() {
     const query = document.getElementById('search').value.toLowerCase();
     const region = document.getElementById('region').value;
+    
     let filtered = allPk.filter(p => {
         const nameMatch = p.name.toLowerCase().includes(query) || (p.subName && p.subName.toLowerCase().includes(query));
-        const isSpec = ['mega','gmax','deoxys','motisma'].includes(p.vType);
+        const isSpec = ['mega','gmax','deoxys','motisma','crown'].includes(p.vType);
+        
+        // Priorité au filtre de puce
         if(activeFilter) return p.vType === activeFilter && nameMatch;
+        
+        // Si recherche textuelle, on montre tout ce qui correspond
         if(query.length > 1 && nameMatch) return true;
+        
+        // Par défaut, masquer les formes alternatives ID > 10000 dans l'index principal
         if(isSpec && p.id > 10000) return false;
+        if(p.isV && p.id > 10000 && !query) return false;
+
         let regM = true;
         if(region !== 'all') {
             const [min, max] = region.split('-').map(Number);
@@ -231,12 +270,15 @@ function render() {
         return nameMatch && regM;
     });
 
+    // Tri par ID
+    filtered.sort((a,b) => (a.parentId || a.id) - (b.parentId || b.id));
+
     const grid = document.getElementById('grid');
     grid.innerHTML = filtered.slice((currentPage-1)*perPage, currentPage*perPage).map(p => {
         const c1 = cMap[p.types[0]] || '#334155', c2 = p.types[1] ? cMap[p.types[1]] : c1;
         return `<div class="card" style="background:linear-gradient(135deg, ${c1} 50%, ${c2} 50%)" onclick="openM(${p.id}, '${p.subName ? p.name + ' ('+p.subName+')' : p.name}')">
             ${p.subName ? `<div class="form-label">${p.subName}</div>` : ''}
-            <img src="${p.img}" loading="lazy">
+            <img src="${p.img}" loading="lazy" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
             <div class="card-info">
                 <h3 style="margin:5px 0; font-size:1.1rem; color:white;">${p.name}</h3>
                 <div>${p.types.map(t => `<span class="type-tag" style="background:${cMap[t]}">${t}</span>`).join('')}</div>
@@ -246,14 +288,26 @@ function render() {
     }).join('');
 
     document.getElementById('st-total').innerText = filtered.length;
-    const total = Math.ceil(filtered.length / perPage);
+    renderPagination(filtered.length);
+}
+
+/**
+ * PAGINATION
+ */
+function renderPagination(totalCount) {
+    const total = Math.ceil(totalCount / perPage);
     const pag = document.getElementById('pagination'); pag.innerHTML = "";
+    if(total <= 1) return;
+
     for(let i=Math.max(1, currentPage-2); i<=Math.min(total, currentPage+2); i++){
         const b = document.createElement('div'); b.className=`p-btn ${i===currentPage?'active':''}`; b.textContent=i;
         b.onclick=()=>{currentPage=i; render(); window.scrollTo(0,400);}; pag.appendChild(b);
     }
 }
 
+/**
+ * MODALE DE DETAILS
+ */
 async function openM(id, name) {
     const box = document.getElementById('m-content');
     document.getElementById('modal').style.display = "flex";
@@ -289,9 +343,12 @@ async function openM(id, name) {
                         <div style="background:#1e293b; height:10px; border-radius:5px;"><div style="background:var(--accent); height:100%; width:${Math.min(s.base_stat/2, 100)}%;"></div></div>
                     </div>`).join('')}
             </div>`;
-    } catch(e) { box.innerHTML = "ERREUR."; }
+    } catch(e) { box.innerHTML = "ERREUR DE CONNEXION AU SERVEUR."; }
 }
 
+/**
+ * UTILITAIRES DE NAVIGATION
+ */
 function resetAll() {
     document.getElementById('search').value = "";
     document.getElementById('region').value = "all";
@@ -313,21 +370,33 @@ function showTab(id, btn) {
     btn.classList.add('active'); 
 }
 
+/**
+ * MODULE QUIZ
+ */
 async function resetQuiz() {
     const img = document.getElementById('q-img');
     img.style.filter = "brightness(0)";
     document.getElementById('q-next').style.display = "none";
     const id = Math.floor(Math.random() * 800) + 1;
-    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(r => r.json());
-    const spec = await fetch(res.species.url).then(r => r.json());
-    const correct = spec.names.find(n => n.language.name === 'fr').name;
-    img.src = res.sprites.other['official-artwork'].front_default;
-    let ch = [correct];
-    while(ch.length < 4) { let n = allPk[Math.floor(Math.random()*1000)].name; if(n && !ch.includes(n)) ch.push(n); }
-    ch.sort(() => Math.random() - 0.5);
-    document.getElementById('q-opts').innerHTML = ch.map(c => `<button style="padding:20px; background:#1e293b; color:white; border:1px solid #334155; border-radius:18px; cursor:pointer;" onclick="this.style.background=( '${c}'==='${correct}'?'var(--accent)':'#ef4444'); document.getElementById('q-img').style.filter='brightness(1)'; document.getElementById('q-next').style.display='block';">${c}</button>`).join('');
+    try {
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(r => r.json());
+        const spec = await fetch(res.species.url).then(r => r.json());
+        const correct = spec.names.find(n => n.language.name === 'fr').name;
+        img.src = res.sprites.other['official-artwork'].front_default;
+        let ch = [correct];
+        while(ch.length < 4) { let n = allPk[Math.floor(Math.random()*1000)].name; if(n && !ch.includes(n) && !n.includes('N°')) ch.push(n); }
+        ch.sort(() => Math.random() - 0.5);
+        document.getElementById('q-opts').innerHTML = ch.map(c => `<button style="padding:20px; background:#1e293b; color:white; border:1px solid #334155; border-radius:18px; cursor:pointer;" onclick="checkAnswer(this, '${c}', '${correct}')">${c}</button>`).join('');
+    } catch(e) { console.error("Quiz Error"); }
 }
 
+function checkAnswer(btn, choice, correct) {
+    btn.style.background = (choice === correct ? 'var(--accent)' : '#ef4444');
+    document.getElementById('q-img').style.filter = 'brightness(1)';
+    document.getElementById('q-next').style.display = 'block';
+}
+
+// Lancement automatique
 init();
 </script>
 </body>
