@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>PokéMedia v9.9.6 — Bio-Terminal Elite</title>
+    <title>PokéMedia v9.9.7 — Bio-Terminal Elite</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         :root{--bg:#020617;--card:#111827;--text:#e5e7eb;--accent:#22c55e;--accent-glow:rgba(34, 197, 94, 0.4);--danger:#ef4444;--shiny:#facc15;}
@@ -17,7 +17,7 @@
         .page.active { display: block; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- INTRO NARRATIVE V9.9.6 --- */
+        /* --- INTRO NARRATIVE V9.9.7 --- */
         .intro-header { 
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.8)); 
             padding: 3.5rem; border-radius: 40px; margin-bottom: 2.5rem; 
@@ -88,13 +88,16 @@
         <div class="intro-content">
             <div class="status-bar">
                 <div class="status-item" style="color:var(--accent)"><span class="dot"></span> SYSTEM ONLINE</div>
-                <div class="status-item">DB_VER: 9.9.6</div>
+                <div class="status-item">DB_VER: 9.9.7</div>
                 <div class="status-item">STATUS: SECURE</div>
             </div>
-            <h1>PokéMedia<span class="version-tag">V9.9.6</span></h1>
+            <h1>PokéMedia<span class="version-tag">V9.9.7</span></h1>
             <div class="intro-desc">
-                Analyse corrective terminée. Protocole <b>Deep-Search X/Y</b> activé. Indexation des <b>Tauros de Paldea</b> et des spécimens <b>Infinimax</b> validée. 
-                Le filtrage par puce isole désormais les mutations sans redondance dans l'index principal.
+               Bienvenue dans l'interface de <b>Bio-Analyse Avancée</b>. Ce terminal indexe les données cellulaires de 1025 espèces identifiées. 
+                Grâce au nouveau protocole <b>Deep-Search</b>, toute recherche nominative débloque instantanément les chaînes de variantes alternatives, 
+                incluant les spécimens <b>instables</b> (Deoxys), <b>plasmatiques</b> (Motisma) et les augmentations <b>Méga-Évolutives</b> et <b>Gigamax</b>.
+                Le filtrage par puce isole désormais les <b>mutations</b> dans l'index principal.
+
             </div>
             <div style="display:flex; gap:40px; margin-top:20px;">
                 <div><small style="display:block; color:var(--accent); font-weight:bold; font-size:0.65rem; letter-spacing:1px;">FLUX DE DONNÉES</small><strong id="st-total" style="font-size:1.8rem;">0</strong></div>
@@ -145,14 +148,15 @@ let sImg = { n: "", s: "", is: false };
 
 const tMap = {fire:'Feu',water:'Eau',grass:'Plante',normal:'Normal',electric:'Electrik',fighting:'Combat',poison:'Poison',ground:'Sol',flying:'Vol',psychic:'Psy',bug:'Insecte',rock:'Roche',ghost:'Spectre',dragon:'Dragon',dark:'Ténèbres',steel:'Acier',fairy:'Fée',ice:'Glace'};
 const cMap = {Feu:'#EE8130',Eau:'#6390F0',Plante:'#7AC74C',Normal:'#A8A77A',Electrik:'#F7D02C',Combat:'#C22E28',Poison:'#A33EA1',Sol:'#E2BF65',Vol:'#A98FF3',Psy:'#F95587',Insecte:'#A6B91A',Roche:'#B6A136',Spectre:'#735797',Dragon:'#6F35FC',Ténèbres:'#705746',Acier:'#B7B7CE',Fée:'#D685AD',Glace:'#96D9D6',Inconnu:'#334155'};
-const fMap = { alola:"🏝️ Alola", deoxys:"🧬 Deoxys", galar:"🛡️ Galar", gmax:"🔥 Gigamax", hisui:"📜 Hisui", mega:"✨ Méga", motisma:"🔌 Motisma", paldea:"🍇 Paldea", crown:"👑 Suprême" };
+const fMap = { alola:"🏝️ Alola", deoxys:"🧬 Deoxys", galar:"🛡️ Galar", gmax:"🔥 Gigamax", hisui:"📜 Hisui", mega:"✨ Méga", motisma:"🔌 Motisma", necrozma:"💠 Necrozma", paldea:"🍇 Paldea", crown:"👑 Suprême" };
 
 const formNames = {
     'mega-x': 'Méga X', 'mega-y': 'Méga Y',
     'deoxys-attack': 'Attaque', 'deoxys-defense': 'Défense', 'deoxys-speed': 'Vitesse',
     'rotom-heat': 'Chaleur', 'rotom-wash': 'Lavage', 'rotom-frost': 'Froid', 'rotom-fan': 'Hélice', 'rotom-mow': 'Tonte',
     'tauros-paldea-combat-breed': 'Combat', 'tauros-paldea-blaze-breed': 'Flamboyante', 'tauros-paldea-aqua-breed': 'Aquatique',
-    'zacian-crowned': 'Épée Suprême', 'zamazenta-crowned': 'Bouclier Suprême', 'eternatus-eternamax': 'Infinimax'
+    'zacian-crowned': 'Épée Suprême', 'zamazenta-crowned': 'Bouclier Suprême', 'eternatus-eternamax': 'Infinimax',
+    'necrozma-dusk': 'Crinière du Couchant', 'necrozma-dawn': 'Ailes de l\'Aurore', 'necrozma-ultra': 'Ultra-Necrozma'
 };
 
 /** INITIALISATION */
@@ -185,6 +189,11 @@ async function init() {
                 p.name = spec.names.find(n => n.language.name === 'fr')?.name || res.name;
                 p.types = res.types.map(t => tMap[t.type.name] || t.type.name);
 
+                // --- AJOUT : Tagging des formes de base pour les filtres ---
+                if(p.name === 'Deoxys') { p.vType = 'deoxys'; p.subName = 'Normale'; }
+                if(p.name === 'Motisma') { p.vType = 'motisma'; p.subName = 'Standard'; }
+                if(p.name === 'Necrozma') { p.vType = 'necrozma'; p.subName = 'Normale'; }
+
                 for(const v of spec.varieties) {
                     if(v.is_default) continue;
                     const vId = v.pokemon.url.split('/').filter(Boolean).pop();
@@ -204,9 +213,9 @@ async function init() {
                     else if(vn.includes('crowned')) { tag = 'crown'; sub = formNames[vn] || 'Suprême'; }
                     else if(vn.includes('deoxys-')) { tag = 'deoxys'; sub = formNames[vn] || vn.split('-')[1]; }
                     else if(vn.includes('rotom-')) { tag = 'motisma'; sub = formNames[vn] || vn.split('-')[1]; }
+                    else if(vn.includes('necrozma-')) { tag = 'necrozma'; sub = formNames[vn]; }
 
                     if(tag) {
-                        // Spécificité Tauros
                         if(p.name === "Tauros" && tag === "paldea") sub = formNames[vn] || "Paldea";
                         
                         allPk.push({ 
@@ -232,6 +241,7 @@ function render() {
         const nameMatch = p.name.toLowerCase().includes(query) || (p.subName && p.subName.toLowerCase().includes(query));
         
         // Anti-doublon : Si on cherche par nom, on ne montre la forme de base qu'une fois
+        // SAUF si c'est la forme de base d'un filtre actif (Deoxys, Motisma, etc.)
         if(activeFilter) return p.vType === activeFilter && nameMatch;
         if(query.length > 1) return nameMatch;
         
